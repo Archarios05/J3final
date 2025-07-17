@@ -1,7 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.Serializable;
 
-class Figure {
+class Figure implements Serializable {
+    private static final long serialVersionUID = 1L;
     protected int x, y, size;
     protected int width, height;
     protected Color color;
@@ -47,5 +49,62 @@ class RectangleFigure extends Figure {
   public void draw(Graphics g) {
     g.setColor(color);
     g.drawRect(x, y, width, height);
+  }
+}
+
+// 塗り潰し四角形クラス
+class FilledRectangleFigure extends Figure {
+  public FilledRectangleFigure(int x, int y, int w, int h, Color c) {
+    super(x, y, w, h, c);
+  }
+  public void draw(Graphics g) {
+    g.setColor(color);
+    g.fillRect(x, y, width, height);
+  }
+}
+
+// 円クラス
+class CircleFigure extends Figure {
+  public CircleFigure(int x, int y, int w, int h, Color c) {
+    super(x, y, w, h, c);
+  }
+  public void draw(Graphics g) {
+    g.setColor(color);
+    g.drawOval(x, y, width, height);
+  }
+}
+
+// 塗り潰し円クラス
+class FilledCircleFigure extends Figure {
+  public FilledCircleFigure(int x, int y, int w, int h, Color c) {
+    super(x, y, w, h, c);
+  }
+  public void draw(Graphics g) {
+    g.setColor(color);
+    g.fillOval(x, y, width, height);
+  }
+}
+
+// 直線クラス
+class LineFigure extends Figure {
+  protected int endX, endY;
+  
+  public LineFigure(int x, int y, int w, int h, Color c) {
+    super(x, y, w, h, c);
+    endX = x + w;
+    endY = y + h;
+  }
+  
+  @Override
+  public void reshape(int x1, int y1, int x2, int y2) {
+    this.x = x1;
+    this.y = y1;
+    this.endX = x2;
+    this.endY = y2;
+  }
+  
+  public void draw(Graphics g) {
+    g.setColor(color);
+    g.drawLine(x, y, endX, endY);
   }
 }

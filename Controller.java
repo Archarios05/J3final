@@ -24,7 +24,7 @@ class DrawController implements MouseListener, MouseMotionListener, KeyListener 
   public void mouseExited(MouseEvent e) {}
   public void mouseMoved(MouseEvent e) {}
   
-  // キーボードで色を変更
+  // キーボードで色を変更（ドロップダウンと併用可能）
   public void keyPressed(KeyEvent e) {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_R: // Rキーで赤
@@ -44,6 +44,19 @@ class DrawController implements MouseListener, MouseMotionListener, KeyListener 
         break;
       case KeyEvent.VK_C: // Cキーでシアン
         model.setCurrentColor(Color.CYAN);
+        break;
+      case KeyEvent.VK_S: // Sキーで保存
+        if (e.isControlDown()) {
+          model.saveFigures("drawings.dat");
+        } else {
+          model.saveAsImage("drawing.png", 500, 500);
+        }
+        break;
+      case KeyEvent.VK_L: // Lキーで読み込み
+        model.loadFigures("drawings.dat");
+        break;
+      case KeyEvent.VK_DELETE: // Deleteキーで全削除
+        model.clearAllFigures();
         break;
     }
   }

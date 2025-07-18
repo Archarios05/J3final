@@ -1,0 +1,91 @@
+@startuml
+' スキンパラメータで見やすくする
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' --- クラスとインターフェースの定義 ---
+
+interface Serializable <<interface>>
+interface ModelObserver <<interface>> {
+  + update(model: DrawModel)
+}
+
+interface MouseListener <<interface>>
+interface MouseMotionListener <<interface>>
+interface KeyListener <<interface>>
+interface ActionListener <<interface>>
+
+abstract class Figure implements Serializable {
+  # x: int
+  # y: int
+  # width: int
+  # height: int
+  # color: Color
+  + {abstract} draw(g: Graphics)
+  + reshape(x1, y1, x2, y2)
+}
+
+class RectangleFigure extends Figure {
+  + draw(g: Graphics)
+}
+class FilledRectangleFigure extends Figure {
+  + draw(g: Graphics)
+}
+class CircleFigure extends Figure {
+  + draw(g: Graphics)
+}
+class FilledCircleFigure extends Figure {
+  + draw(g: Graphics)
+}
+class LineFigure extends Figure {
+  + draw(g: Graphics)
+  + reshape(x1, y1, x2, y2)
+}
+
+class DrawModel {
+  - fig: ArrayList<Figure>
+  - observers: List<ModelObserver>
+  - currentColor: Color
+  - currentFigureType: String
+  + createFigure(x, y)
+  + saveFigures(filename)
+  + loadFigures(filename)
+  + notifyObservers()
+}
+
+class ViewPanel extends JPanel implements ModelObserver, ActionListener {
+  - model: DrawModel
+  - controller: DrawController
+  + paintDrawing(g: Graphics)
+  + update(model: DrawModel)
+  + actionPerformed(e: ActionEvent)
+}
+
+class DrawController implements MouseListener, MouseMotionListener, KeyListener {
+  - model: DrawModel
+  + mousePressed(e: MouseEvent)
+  + keyPressed(e: KeyEvent)
+}
+
+class DrawFrame extends JFrame {
+  - model: DrawModel
+  - view: ViewPanel
+  - controller: DrawController
+}
+
+' --- クラス間の関係性 ---
+
+DrawFrame o-- DrawModel : creates
+DrawFrame o-- ViewPanel : creates
+DrawFrame o-- DrawController : creates
+
+ViewPanel --> DrawModel : "1. observes"
+DrawModel "1" *--> "many" Figure : "holds"
+DrawModel "1" *--> "many" ModelObserver : "holds"
+DrawModel ..> ModelObserver : "2. notifies"
+
+DrawController --> DrawModel : "3. manipulates"
+
+ViewPanel ..> DrawController : "4. delegates user input"
+
+@enduml

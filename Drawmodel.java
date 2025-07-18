@@ -18,7 +18,7 @@ class DrawModel {
     drawingFigure = null;
     currentColor = Color.RED;  // Color.red は deprecated なので Color.RED に変更
     observers = new ArrayList<ModelObserver>();
-    currentFigureType = "Rectangle"; // デフォルトは四角形
+    currentFigureType = "Rectangle"; // デフォルト四角形
   }
 
   // コピペから非推奨機能を削除、observableはjava9から非推奨

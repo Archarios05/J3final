@@ -52,7 +52,7 @@ class DrawController implements MouseListener, MouseMotionListener, KeyListener 
           model.saveAsImage("drawing.png", 500, 500);
         }
         break;
-      case KeyEvent.VK_L: // Lキーで読み込み
+      case KeyEvent.VK_0: // 0キーで読み込み
         model.loadFigures("drawings.dat");
         break;
       case KeyEvent.VK_DELETE: // Deleteキーで全削除

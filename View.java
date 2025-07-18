@@ -1,10 +1,13 @@
 import javax.swing.JPanel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -16,12 +19,13 @@ class ViewPanel extends JPanel implements ModelObserver, ActionListener {
   protected DrawModel model;
   protected JComboBox<String> figureSelector;
   protected JComboBox<String> colorSelector;
+  protected JButton colorPickerButton;
   
   public ViewPanel(DrawModel m, DrawController c) {
     this.setLayout(new BorderLayout());
     
     // 上部パネルを作成（図形選択と色選択を配置）
-    JPanel topPanel = new JPanel();
+    JPanel topPanel = new JPanel(new FlowLayout());
     
     // 図形選択用のコンボボックスを作成
     String[] figureTypes = {"Rectangle", "FilledRectangle", "Circle", "FilledCircle", "Line"};
@@ -33,11 +37,16 @@ class ViewPanel extends JPanel implements ModelObserver, ActionListener {
     colorSelector = new JComboBox<>(colorTypes);
     colorSelector.addActionListener(this);
     
-    // ラベルとコンボボックスを上部パネルに追加
-    topPanel.add(new javax.swing.JLabel("図形:"));
+    // カラーピッカーボタンを作成
+    colorPickerButton = new JButton("色選択");
+    colorPickerButton.addActionListener(this);
+    
+    // ラベルとコンポーネントを上部パネルに追加
+    topPanel.add(new JLabel("図形:"));
     topPanel.add(figureSelector);
-    topPanel.add(new javax.swing.JLabel("色:"));
+    topPanel.add(new JLabel("色:"));
     topPanel.add(colorSelector);
+    topPanel.add(colorPickerButton);
     
     // 描画領域となるパネルを作成
     JPanel drawingPanel = new JPanel() {
@@ -53,6 +62,15 @@ class ViewPanel extends JPanel implements ModelObserver, ActionListener {
     drawingPanel.addMouseMotionListener(c);
     drawingPanel.addKeyListener(c);
     drawingPanel.setFocusable(true);
+    drawingPanel.requestFocusInWindow(); // フォーカスを明示的に要求
+    
+    // マウスクリック時にフォーカスを取得する
+    drawingPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+      @Override
+      public void mouseClicked(java.awt.event.MouseEvent e) {
+        drawingPanel.requestFocusInWindow();
+      }
+    });
     
     // レイアウト設定
     this.add(topPanel, BorderLayout.NORTH);
@@ -84,26 +102,19 @@ class ViewPanel extends JPanel implements ModelObserver, ActionListener {
     g.fillRect(10, 10, 50, 20);
     g.setColor(Color.BLACK);
     g.drawRect(10, 10, 50, 20);
-    g.drawString("Current Color: " + getColorName(model.getCurrentColor()), 70, 25);
-    g.drawString("Figure: " + model.getCurrentFigureType(), 10, 45);
-    g.drawString("Save: S(PNG) Ctrl+S(Data) | Load: L | Clear: Delete", 10, 65);
+    
+    // 色の詳細情報を表示
+    Color currentColor = model.getCurrentColor();
+    String colorInfo = String.format("RGB(%d,%d,%d)", 
+                                    currentColor.getRed(), 
+                                    currentColor.getGreen(), 
+                                    currentColor.getBlue());
+    g.drawString("現在の色: " + colorInfo, 70, 25);
+    g.drawString("図形: " + model.getCurrentFigureType(), 10, 45);
+    g.drawString("保存: S(PNG) Ctrl+S(Data) | 読込: 0 | クリア: Delete", 10, 65);
   }
   
-  // 色名を取得するヘルパーメソッド
-  private String getColorName(Color color) {
-    if (color.equals(Color.RED)) return "Red";
-    if (color.equals(Color.GREEN)) return "Green";
-    if (color.equals(Color.BLUE)) return "Blue";
-    if (color.equals(Color.YELLOW)) return "Yellow";
-    if (color.equals(Color.MAGENTA)) return "Magenta";
-    if (color.equals(Color.CYAN)) return "Cyan";
-    if (color.equals(Color.BLACK)) return "Black";
-    if (color.equals(Color.ORANGE)) return "Orange";
-    if (color.equals(Color.PINK)) return "Pink";
-    return "Unknown";
-  }
-  
-  // JComboBoxの選択変更イベント処理
+  // JComboBoxとボタンの選択変更・クリックイベント処理
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == figureSelector) {
       String selectedFigure = (String) figureSelector.getSelectedItem();
@@ -112,6 +123,13 @@ class ViewPanel extends JPanel implements ModelObserver, ActionListener {
       String selectedColor = (String) colorSelector.getSelectedItem();
       Color color = getColorFromName(selectedColor);
       model.setCurrentColor(color);
+    } else if (e.getSource() == colorPickerButton) {
+      // JColorChooserダイアログを表示
+      Color currentColor = model.getCurrentColor();
+      Color newColor = JColorChooser.showDialog(this, "色を選択してください", currentColor);
+      if (newColor != null) {
+        model.setCurrentColor(newColor);
+      }
     }
   }
   
